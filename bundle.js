@@ -62,20 +62,27 @@
 	var _displayJs2 = _interopRequireDefault(_displayJs);
 
 	var canvas = document.getElementById('main');
-	var button = document.getElementById('solve');
+	var solve_button = document.getElementById('solve');
+	var gen_button = document.getElementById('generate');
 	var tile_size = 10;
 	var delay = 20;
 
 	var myDisplay = new _displayJs2['default'](tile_size, canvas);
 
-	var myMaze = new _mazeJs2['default'](tile_size, canvas.width, canvas.height, myDisplay, delay);
+	var myMaze = new _mazeJs2['default'](tile_size, canvas.width, canvas.height, myDisplay);
 
 	myMaze.gen_random();
 	myDisplay.render(myMaze);
 
-	button.addEventListener('click', function () {
+	solve_button.addEventListener('click', function () {
 	    console.log('solving...');
-	    myMaze.a_star_search();
+	    myMaze.a_star_search(delay);
+	});
+
+	gen_button.addEventListener('click', function () {
+	    console.log('generating...');
+	    myMaze.gen_random();
+	    myDisplay.render(myMaze);
 	});
 
 /***/ },
@@ -105,7 +112,7 @@
 	var _queueJs2 = _interopRequireDefault(_queueJs);
 
 	var Maze = (function () {
-	    function Maze(tile_size, width, height, display, delay) {
+	    function Maze(tile_size, width, height, display) {
 	        _classCallCheck(this, Maze);
 
 	        this.tile_size = tile_size;
@@ -116,14 +123,22 @@
 	        this.end_tile = null;
 	        this.searched = [];
 	        this.display = display;
-	        this.delay = delay;
 	    }
 
 	    _createClass(Maze, [{
+	        key: "reset",
+	        value: function reset() {
+	            this.tiles = [];
+	            this.end_tile = null;
+	            this.start_tile = null;
+	            this.searched = [];
+	        }
+	    }, {
 	        key: "gen_random",
 
 	        // generate random maze
 	        value: function gen_random() {
+	            this.reset();
 	            for (var y = 0; y < this.height / this.tile_size; y++) {
 	                for (var x = 0; x < this.width / this.tile_size; x++) {
 	                    var wall = Math.random() <= 0.25;
@@ -228,6 +243,8 @@
 	        value: function a_star_search() {
 	            var _this = this;
 
+	            var delay = arguments[0] === undefined ? 20 : arguments[0];
+
 	            var frontier = new _queueJs2["default"]();
 	            frontier.add(0, this.start_tile);
 	            this.searched.push(this.start_tile);
@@ -285,7 +302,7 @@
 	                }
 
 	                _this.display.render(_this);
-	            }, this.delay);
+	            }, delay);
 	        }
 	    }, {
 	        key: "trace_path",
@@ -397,37 +414,61 @@
 	    _createClass(Display, [{
 	        key: 'render',
 	        value: function render(maze) {
-	            var _this = this;
+	            this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+	            var _iteratorNormalCompletion = true;
+	            var _didIteratorError = false;
+	            var _iteratorError = undefined;
 
-	            maze.tiles.forEach(function (tile) {
-	                if (tile.type === 1) {
-	                    _this.ctx.fillRect(tile.x * 10, tile.y * 10, 10, 10);
-	                } else if (tile.type === 2) {
-	                    _this.ctx.fillStyle = '#00FF00';
-	                    _this.ctx.fillRect(tile.x * 10, tile.y * 10, 10, 10);
-	                } else if (tile.type === 3) {
-	                    _this.ctx.fillStyle = '#FF0000';
-	                    _this.ctx.fillRect(tile.x * 10, tile.y * 10, 10, 10);
-	                } else if (tile.type === 4) {
-	                    _this.ctx.fillStyle = '#0000FF';
-	                    _this.ctx.fillRect(tile.x * 10, tile.y * 10, 10, 10);
-	                } else if (tile.type === 5) {
-	                    _this.ctx.fillStyle = '#FFA500';
-	                    _this.ctx.fillRect(tile.x * 10, tile.y * 10, 10, 10);
+	            try {
+	                for (var _iterator = maze.tiles[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+	                    var tile = _step.value;
+
+	                    switch (tile.type) {
+	                        case 0:
+	                            this.ctx.fillStyle = '#d3d3d3';
+	                            this.draw_tile(tile);
+	                            break;
+	                        case 1:
+	                            this.ctx.fillStyle = '#000000';
+	                            this.draw_tile(tile);
+	                            break;
+	                        case 2:
+	                            this.ctx.fillStyle = '#00FF00';
+	                            this.draw_tile(tile);
+	                            break;
+	                        case 3:
+	                            this.ctx.fillStyle = '#FF0000';
+	                            this.draw_tile(tile);
+	                            break;
+	                        case 4:
+	                            this.ctx.fillStyle = '#0000FF';
+	                            this.draw_tile(tile);
+	                            break;
+	                        case 5:
+	                            this.ctx.fillStyle = '#FFA500';
+	                            this.draw_tile(tile);
+	                            break;
+	                    }
 	                }
-	                _this.ctx.fillStyle = '#000000';
-	            });
+	            } catch (err) {
+	                _didIteratorError = true;
+	                _iteratorError = err;
+	            } finally {
+	                try {
+	                    if (!_iteratorNormalCompletion && _iterator['return']) {
+	                        _iterator['return']();
+	                    }
+	                } finally {
+	                    if (_didIteratorError) {
+	                        throw _iteratorError;
+	                    }
+	                }
+	            }
 	        }
 	    }, {
-	        key: 'animate',
-	        value: function animate(maze) {
-	            var _this2 = this;
-
-	            this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-	            this.render(maze);
-	            window.requestAnimationFrame(function () {
-	                _this2.animate(maze);
-	            });
+	        key: 'draw_tile',
+	        value: function draw_tile(tile) {
+	            this.ctx.fillRect(tile.x * 10, tile.y * 10, 10, 10);
 	        }
 	    }]);
 

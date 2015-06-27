@@ -8,7 +8,7 @@ import Queue from './queue.js'
 
 class Maze {
     
-    constructor(tile_size, width, height, display, delay) {
+    constructor(tile_size, width, height, display) {
         this.tile_size = tile_size
         this.height = height 
         this.width = width
@@ -17,11 +17,20 @@ class Maze {
         this.end_tile = null
         this.searched = []
         this.display = display
-        this.delay = delay
+    }
+
+    reset() 
+    {
+        this.tiles = []
+        this.end_tile = null
+        this.start_tile = null
+        this.searched = []
     }
    
     // generate random maze 
-    gen_random() {
+    gen_random() 
+    {
+        this.reset()
         for (let y = 0; y < this.height / this.tile_size; y++) {
             for (let x = 0; x < this.width / this.tile_size; x++) { 
                 let wall = Math.random() <= 0.25
@@ -65,14 +74,14 @@ class Maze {
     //this is a formal apology for the following method. I'm sorry.
     tile_in_bounds(og_tile, tile)
     {
-        return tile != undefined && (   (Math.abs(og_tile.x - tile.x) == 1 
-                                            && Math.abs(og_tile.y - tile.y) == 0
-                                        )
-                                    || 
-                                        (Math.abs(og_tile.x - tile.x) == 0
-                                            && Math.abs(og_tile.y - tile.y) == 1
-                                        )
-                                    )
+        return tile != undefined && 
+            (
+                (Math.abs(og_tile.x - tile.x) == 1 
+                 && Math.abs(og_tile.y - tile.y) == 0) 
+            || 
+                (Math.abs(og_tile.x - tile.x) == 0 
+                 && Math.abs(og_tile.y - tile.y) == 1)
+            )
     }
 
     
@@ -110,7 +119,7 @@ class Maze {
         return tile.x + (tile.y * 50)
     }
 
-    a_star_search()
+    a_star_search(delay=20)
     {
         let frontier = new Queue()
         frontier.add(0, this.start_tile)
@@ -146,7 +155,7 @@ class Maze {
             }
             this.display.render(this)    
         
-        }, this.delay)
+        }, delay)
     }
 
     trace_path()

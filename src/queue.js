@@ -16,7 +16,7 @@ class Queue {
             let index = 0
             while (index < this.items.length
                   && priority > this.items[index][0]) {
-                index++
+                  index++
             }
             let item = [priority, element]
 

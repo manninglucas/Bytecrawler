@@ -13,32 +13,40 @@ class Display {
     }
 
     render(maze) {
-        maze.tiles.forEach(tile => {
-            if (tile.type === 1) {
-               this.ctx.fillRect(tile.x*10, tile.y*10, 10, 10) 
-            } else if (tile.type === 2) {
-                this.ctx.fillStyle = '#00FF00'
-                this.ctx.fillRect(tile.x*10, tile.y*10, 10, 10)
-            } else if (tile.type === 3) {
-                this.ctx.fillStyle = '#FF0000'
-                this.ctx.fillRect(tile.x*10, tile.y*10, 10, 10)
-            } else if (tile.type === 4) {
-                this.ctx.fillStyle = '#0000FF'
-                this.ctx.fillRect(tile.x*10, tile.y*10, 10, 10)
-            } else if (tile.type === 5) {
-                this.ctx.fillStyle = '#FFA500'
-                this.ctx.fillRect(tile.x*10, tile.y*10, 10, 10)
+        this.ctx.clearRect(0,0,this.canvas.width,this.canvas.height)
+        for (let tile of maze.tiles) {
+            switch (tile.type) {
+                case 0:
+                    this.ctx.fillStyle = '#d3d3d3'
+                    this.draw_tile(tile)
+                    break
+                case 1:
+                    this.ctx.fillStyle = '#000000'
+                    this.draw_tile(tile)
+                    break
+                case 2:
+                    this.ctx.fillStyle = '#00FF00'
+                    this.draw_tile(tile)
+                    break
+                case 3:
+                    this.ctx.fillStyle = '#FF0000'
+                    this.draw_tile(tile)
+                    break
+                case 4:
+                    this.ctx.fillStyle = '#0000FF'
+                    this.draw_tile(tile)
+                    break
+                case 5:
+                    this.ctx.fillStyle = '#FFA500'
+                    this.draw_tile(tile)
+                    break
             }
-            this.ctx.fillStyle = '#000000'
-        })
+        }
     }
 
-    animate(maze) {
-        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height)
-        this.render(maze)
-        window.requestAnimationFrame(() => {
-            this.animate(maze)
-        })     
+    draw_tile(tile)
+    {
+        this.ctx.fillRect(tile.x*10, tile.y*10, 10, 10)
     }
 }
 
